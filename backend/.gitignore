@@ -1,8 +1,51 @@
-node_modules
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Environment
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-dist
-coverage
+# Build output
+dist/
+build/
+out/
 
-.vscode
-.idea
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+
+# Coverage / testing
+coverage/
+.nyc_output/
+
+# Runtime files
+*.pid
+*.seed
+*.pid.lock
+
+# IDE / editor
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Drizzle / DB
+drizzle/
+*.sqlite
+*.db
+
+# pnpm
+pnpm-debug.log*
