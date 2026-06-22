@@ -31,3 +31,17 @@ export const login = async (req, res) => {
     });
   }
 };
+
+export const me = async (req, res) => {
+  try {
+    res.json({
+      ok: true,
+      user: req.user,
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      message: error.message,
+    });
+  }
+};
