@@ -55,3 +55,38 @@ export const loginUser = async ({ email, password }) => {
     token,
   };
 };
+
+export const changePasswordService = async ({
+  user_id,
+  currentPassword,
+  newPassword,
+}) => {
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.user_id, user_id));
+
+  if (!user.length) {
+    throw new Error("User not found");
+  }
+
+  const valid = await bcrypt.compare(
+    currentPassword,
+    user[0].password_hash
+  );
+
+  if (!valid) {
+    throw new Error("Current password is incorrect");
+  }
+
+  const newHash = await bcrypt.hash(newPassword, 10);
+
+  await db
+    .update(users)
+    .set({
+      password_hash: newHash,
+    })
+    .where(eq(users.user_id, user_id));
+
+  return true;
+};
