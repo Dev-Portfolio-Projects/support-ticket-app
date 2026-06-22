@@ -2,17 +2,21 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
-import { createDb  } from "./db/index.js";
+import { db } from "./db/index.js";
+
+// AUTH ROUTES
+import authRoutes from "./modules/auth/auth.routes.js";
 
 const app = express();
-const db = createDb();
 
 app.use(express.json());
 
+// HEALTH CHECK
 app.get("/", (req, res) => {
   res.json({ message: "API funcionando 🚀" });
 });
 
+// DB TEST (Neon + Drizzle)
 app.get("/db-test", async (req, res) => {
   try {
     const result = await db.execute("select 1 as ok");
@@ -33,6 +37,10 @@ app.get("/db-test", async (req, res) => {
   }
 });
 
+// AUTH MODULE
+app.use("/auth", authRoutes);
+
+// START SERVER
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
