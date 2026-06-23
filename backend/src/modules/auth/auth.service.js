@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { db } from "../../db/index.js";
@@ -87,6 +88,67 @@ export const changePasswordService = async ({
       password_hash: newHash,
     })
     .where(eq(users.user_id, user_id));
+
+  return true;
+};
+
+export const requestPasswordResetService = async ({ email }) => {
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.email, email));
+
+  if (!user.length) {
+    throw new Error("User not found");
+  }
+
+  const token = crypto.randomBytes(32).toString("hex");
+
+  const expiry = new Date(Date.now() + 1000 * 60 * 15);
+
+  await db
+    .update(users)
+    .set({
+      reset_token: token,
+      reset_token_exp: expiry,
+    })
+    .where(eq(users.email, email));
+
+  return {
+    message: "Reset token generated",
+    token,
+  };
+};
+
+export const resetPasswordService = async ({
+  token,
+  newPassword,
+}) => {
+  const user = await db
+    .select()
+    .from(users)
+    .where(eq(users.reset_token, token));
+
+  if (!user.length) {
+    throw new Error("Invalid token");
+  }
+
+  const userData = user[0];
+
+  if (new Date(userData.reset_token_exp) < new Date()) {
+    throw new Error("Token expired");
+  }
+
+  const hashed = await bcrypt.hash(newPassword, 10);
+
+  await db
+    .update(users)
+    .set({
+      password_hash: hashed,
+      reset_token: null,
+      reset_token_exp: null,
+    })
+    .where(eq(users.user_id, userData.user_id));
 
   return true;
 };

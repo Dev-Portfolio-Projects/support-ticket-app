@@ -10,5 +10,8 @@ export const users = pgTable("users", {
 
   role_id: integer("role_id"),
 
+  reset_token: text("reset_token"),
+  reset_token_exp: timestamp("reset_token_exp"),
+
   created_at: timestamp("created_at").defaultNow(),
 });

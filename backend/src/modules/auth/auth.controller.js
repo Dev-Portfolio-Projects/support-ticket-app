@@ -1,4 +1,4 @@
-import { createUser, loginUser, changePasswordService } from "./auth.service.js";
+import { createUser, loginUser, changePasswordService, requestPasswordResetService, resetPasswordService } from "./auth.service.js";
 
 export const register = async (req, res) => {
   try {
@@ -61,6 +61,40 @@ export const changePassword = async (req, res) => {
     res.json({
       ok: true,
       message: "Password updated successfully",
+    });
+  } catch (error) {
+    res.status(400).json({
+      ok: false,
+      message: error.message,
+    });
+  }
+};
+
+export const requestReset = async (req, res) => {
+  try {
+    const result = await requestPasswordResetService(req.body);
+
+    res.json({
+      ok: true,
+      ...result,
+    });
+  } catch (error) {
+    res.status(400).json({
+      ok: false,
+      message: error.message,
+    });
+  }
+};
+
+export const resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    await resetPasswordService({ token, newPassword });
+
+    res.json({
+      ok: true,
+      message: "Password reset successfully",
     });
   } catch (error) {
     res.status(400).json({
