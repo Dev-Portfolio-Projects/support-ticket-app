@@ -2,10 +2,13 @@ import * as service from "./dashboard.service.js";
 
 export const getDashboard = async (req, res) => {
   try {
-    const total = await service.getTotalTickets();
-    const byStatus = await service.getTicketsByStatus();
-    const byPriority = await service.getTicketsByPriority();
-    const openClosed = await service.getOpenVsClosed();
+    const [total, byStatus, byPriority, openClosed] =
+      await Promise.all([
+        service.getTotalTickets(),
+        service.getTicketsByStatus(),
+        service.getTicketsByPriority(),
+        service.getOpenVsClosed(),
+      ]);
 
     res.json({
       ok: true,
@@ -16,10 +19,13 @@ export const getDashboard = async (req, res) => {
         openClosed,
       },
     });
+
   } catch (error) {
+    console.error("Dashboard error:", error);
+
     res.status(500).json({
       ok: false,
-      error: error.message,
+      error: "Error al obtener dashboard",
     });
   }
 };

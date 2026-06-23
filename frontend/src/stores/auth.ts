@@ -10,11 +10,11 @@ interface LoginResponse {
 export const useAuthStore = defineStore("auth", {
   state: () => ({
     token: localStorage.getItem("token") || "",
-    user: null as User | null,
+    user: JSON.parse(localStorage.getItem("user") || "null"),
   }),
 
   getters: {
-    isAuthenticated: (state) => !!state.token,
+    isAuthenticated: (state) => !!state.token && !!state.user,
   },
 
   actions: {
@@ -39,6 +39,7 @@ export const useAuthStore = defineStore("auth", {
       this.user = res.data.user;
 
       localStorage.setItem("token", this.token);
+      localStorage.setItem("user", JSON.stringify(this.user));
     },
 
     logout() {
@@ -46,6 +47,7 @@ export const useAuthStore = defineStore("auth", {
       this.user = null;
 
       localStorage.removeItem("token");
+      localStorage.removeItem("user");
     },
   },
 });

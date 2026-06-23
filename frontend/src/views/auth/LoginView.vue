@@ -74,8 +74,10 @@ import AuthLayout from "@/layouts/AuthLayout.vue";
 import { useAuthStore } from "@/stores/auth";
 import { toast } from "vue-sonner";
 import { Mail, Lock, Eye, EyeOff } from "lucide-vue-next";
+import { useRouter } from "vue-router";
 
 const auth = useAuthStore();
+const router = useRouter();
 
 const form = reactive({
   email: "",
@@ -88,6 +90,7 @@ const login = async () => {
   try {
     await auth.login(form);
     toast.success("Bienvenido");
+    router.push("/dashboard");
   } catch (error) {
     toast.error("Credenciales inválidas");
   }

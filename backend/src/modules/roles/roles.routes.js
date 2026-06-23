@@ -5,10 +5,13 @@ import {
   list,
 } from "./roles.controller.js";
 
+import { authenticateMiddleware } from "../../middlewares/authenticate.middleware.js";
+import { authorizeMiddleware } from "../../middlewares/authorize.middleware.js";
+
 const router = Router();
 
-router.post("/", create);
+router.post("/", authenticateMiddleware, authorizeMiddleware(1), create);
 
-router.get("/", list);
+router.get("/", authenticateMiddleware, authorizeMiddleware(1), list);
 
 export default router;
