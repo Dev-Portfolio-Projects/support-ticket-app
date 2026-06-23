@@ -1,6 +1,7 @@
 import { db } from "../../db/index.js";
 import { tickets } from "../../schema/tickets.js";
 import { eq } from "drizzle-orm";
+import * as audit from "../audit/audit.service.js";
 
 export const createTicket = async (data) => {
   const result = await db
@@ -8,7 +9,20 @@ export const createTicket = async (data) => {
     .values(data)
     .returning();
 
-  return result[0];
+  const ticket = result[0];
+
+  await audit.createLog({
+    user_id: data.requester_id,
+    action: "CREATE_TICKET",
+    entity: "tickets",
+    entity_id: ticket.ticket_id,
+    metadata: {
+      title: data.title,
+      priority: data.priority,
+    },
+  });
+
+  return ticket;
 };
 
 export const getTickets = async () => {
@@ -24,10 +38,7 @@ export const getTicketById = async (id) => {
   return result[0];
 };
 
-export const updateTicket = async (
-  id,
-  data
-) => {
+export const updateTicket = async (id, data) => {
   const result = await db
     .update(tickets)
     .set({
@@ -37,7 +48,17 @@ export const updateTicket = async (
     .where(eq(tickets.ticket_id, id))
     .returning();
 
-  return result[0];
+  const ticket = result[0];
+
+  await audit.createLog({
+    user_id: data.user_id,
+    action: "UPDATE_TICKET",
+    entity: "tickets",
+    entity_id: id,
+    metadata: data,
+  });
+
+  return ticket;
 };
 
 export const closeTicket = async (id) => {
@@ -51,13 +72,22 @@ export const closeTicket = async (id) => {
     .where(eq(tickets.ticket_id, id))
     .returning();
 
-  return result[0];
+  const ticket = result[0];
+
+  await audit.createLog({
+    user_id: ticket.assigned_to || ticket.requester_id,
+    action: "CLOSE_TICKET",
+    entity: "tickets",
+    entity_id: id,
+    metadata: {
+      status: "closed",
+    },
+  });
+
+  return ticket;
 };
 
-export const assignTicket = async (
-  ticketId,
-  assignedTo
-) => {
+export const assignTicket = async (ticketId, assignedTo) => {
   const result = await db
     .update(tickets)
     .set({
@@ -67,5 +97,17 @@ export const assignTicket = async (
     .where(eq(tickets.ticket_id, ticketId))
     .returning();
 
-  return result[0];
+  const ticket = result[0];
+
+  await audit.createLog({
+    user_id: assignedTo,
+    action: "ASSIGN_TICKET",
+    entity: "tickets",
+    entity_id: ticketId,
+    metadata: {
+      assigned_to: assignedTo,
+    },
+  });
+
+  return ticket;
 };

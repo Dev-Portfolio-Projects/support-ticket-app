@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { db } from "../../db/index.js";
 import { users } from "../../schema/users.js";
 import { eq } from "drizzle-orm";
+import * as audit from "../audit/audit.service.js";
 
 export const createUser = async ({ full_name, email, password, role_id = 3 }) => {
   const hashed = await bcrypt.hash(password, 10);
@@ -18,7 +19,20 @@ export const createUser = async ({ full_name, email, password, role_id = 3 }) =>
     })
     .returning();
 
-  return newUser[0];
+  const user = newUser[0];
+
+  await audit.createLog({
+    user_id: user.user_id,
+    action: "CREATE_USER",
+    entity: "users",
+    entity_id: user.user_id,
+    metadata: {
+      email: user.email,
+      role_id,
+    },
+  });
+
+  return user;
 };
 
 export const loginUser = async ({ email, password }) => {
@@ -51,6 +65,16 @@ export const loginUser = async ({ email, password }) => {
   );
 
   const { password_hash, ...safeUser } = user[0];
+
+  await audit.createLog({
+    user_id: user[0].user_id,
+    action: "LOGIN_SUCCESS",
+    entity: "auth",
+    entity_id: user[0].user_id,
+    metadata: {
+      email: user[0].email,
+    },
+  });
 
   return {
     user: safeUser,
@@ -90,6 +114,13 @@ export const changePasswordService = async ({
     })
     .where(eq(users.user_id, user_id));
 
+  await audit.createLog({
+    user_id,
+    action: "PASSWORD_CHANGE",
+    entity: "users",
+    entity_id: user_id,
+  });
+
   return true;
 };
 
@@ -114,6 +145,13 @@ export const requestPasswordResetService = async ({ email }) => {
       reset_token_exp: expiry,
     })
     .where(eq(users.email, email));
+
+  await audit.createLog({
+    user_id: user[0].user_id,
+    action: "PASSWORD_RESET_REQUEST",
+    entity: "auth",
+    entity_id: user[0].user_id,
+  });
 
   return {
     message: "Reset token generated",
@@ -150,6 +188,13 @@ export const resetPasswordService = async ({
       reset_token_exp: null,
     })
     .where(eq(users.user_id, userData.user_id));
+
+  await audit.createLog({
+    user_id: userData.user_id,
+    action: "PASSWORD_RESET_DONE",
+    entity: "auth",
+    entity_id: userData.user_id,
+  });
 
   return true;
 };
