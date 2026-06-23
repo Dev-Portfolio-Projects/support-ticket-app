@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
+import cors from "cors";
 
 import authRoutes from "./modules/auth/auth.routes.js";
 import rolesRoutes from "./modules/roles/roles.routes.js";
@@ -12,6 +13,11 @@ import auditRoutes from "./modules/audit/audit.routes.js";
 import dashboardRoutes from "./modules/dashboard/dashboard.routes.js";
 
 const app = express();
+
+app.use(cors({
+  origin: process.env.CLIENT_URL,
+  credentials: true
+}));
 
 app.use(express.json());
 
