@@ -5,7 +5,7 @@ import { db } from "../../db/index.js";
 import { users } from "../../schema/users.js";
 import { eq } from "drizzle-orm";
 
-export const createUser = async ({ full_name, email, password }) => {
+export const createUser = async ({ full_name, email, password, role_id = 3 }) => {
   const hashed = await bcrypt.hash(password, 10);
 
   const newUser = await db
@@ -14,6 +14,7 @@ export const createUser = async ({ full_name, email, password }) => {
       full_name,
       email,
       password_hash: hashed,
+      role_id,
     })
     .returning();
 

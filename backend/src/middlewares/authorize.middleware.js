@@ -1,4 +1,4 @@
-export const authorize = (...roles) => {
+export const authorizeMiddleware = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role_id)) {
       return res.status(403).json({
