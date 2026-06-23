@@ -56,3 +56,32 @@ export const close = async (req, res) => {
     ticket,
   });
 };
+
+export const assign =
+  async (req, res) => {
+    try {
+      const ticketId = Number(
+        req.params.id
+      );
+
+      const { assigned_to } = req.body;
+
+      const ticket =
+        await service.assignTicket(
+          ticketId,
+          assigned_to
+        );
+
+      res.json({
+        ok: true,
+        message:
+          "Ticket assigned successfully",
+        ticket,
+      });
+    } catch (error) {
+      res.status(500).json({
+        ok: false,
+        error: error.message,
+      });
+    }
+  };

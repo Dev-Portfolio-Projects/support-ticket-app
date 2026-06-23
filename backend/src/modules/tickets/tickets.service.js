@@ -53,3 +53,19 @@ export const closeTicket = async (id) => {
 
   return result[0];
 };
+
+export const assignTicket = async (
+  ticketId,
+  assignedTo
+) => {
+  const result = await db
+    .update(tickets)
+    .set({
+      assigned_to: assignedTo,
+      updated_at: new Date(),
+    })
+    .where(eq(tickets.ticket_id, ticketId))
+    .returning();
+
+  return result[0];
+};
