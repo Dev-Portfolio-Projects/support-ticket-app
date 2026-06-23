@@ -6,6 +6,7 @@ import express from "express";
 import authRoutes from "./modules/auth/auth.routes.js";
 import rolesRoutes from "./modules/roles/roles.routes.js";
 import catalogRoutes from "./modules/catalog/catalog.routes.js";
+import ticketsRoutes from "./modules/tickets/tickets.routes.js";
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.get("/", (req, res) => {
 app.use("/auth", authRoutes);
 app.use("/roles", rolesRoutes);
 app.use("/catalog", catalogRoutes);
+app.use("/tickets", ticketsRoutes);
 
 // START SERVER
 const PORT = process.env.PORT || 3000;
