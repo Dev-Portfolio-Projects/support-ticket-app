@@ -1,8 +1,7 @@
 import { db } from "../../db/index.js";
 import { tickets } from "../../schema/tickets.js";
-import { eq, count, isNotNull, isNull } from "drizzle-orm";
-import { ticketStatuses } from "../../schema/catalog.js";
-import { ticketPriorities } from "../../schema/catalog.js";
+import { eq, count, sql } from "drizzle-orm";
+import { ticketStatuses, ticketPriorities } from "../../schema/catalog.js";
 
 export const getTotalTickets = async () => {
   const result = await db
@@ -30,12 +29,12 @@ export const getOpenVsClosed = async () => {
   const open = await db
     .select({ total: count() })
     .from(tickets)
-    .where(isNull(tickets.closed_at));
+    .where(sql`${tickets.status_id} != 4`);
 
   const closed = await db
     .select({ total: count() })
     .from(tickets)
-    .where(isNotNull(tickets.closed_at));
+    .where(eq(tickets.status_id, 4));
 
   return {
     open: open[0].total,
