@@ -41,3 +41,17 @@ export const getPriorities = () =>
 
 export const getCategories = () =>
   db.select().from(categories);
+
+export const getCatalog = async () => {
+  const [statuses, priorities, categoriesList] = await Promise.all([
+    db.select().from(ticketStatuses),
+    db.select().from(ticketPriorities),
+    db.select().from(categories),
+  ]);
+
+  return {
+    statuses,
+    priorities,
+    categories: categoriesList,
+  };
+};

@@ -68,3 +68,12 @@ export const getCategories = async (
     categories: await service.getCategories(),
   });
 };
+
+export const getCatalog = async (req, res) => {
+  const data = await service.getCatalog();
+
+  res.json({
+    ok: true,
+    ...data,
+  });
+};

@@ -18,7 +18,7 @@ export const createTicket = async (data) => {
     entity_id: ticket.ticket_id,
     metadata: {
       title: data.title,
-      priority: data.priority,
+      priority_id: data.priority_id,
     },
   });
 
@@ -42,7 +42,11 @@ export const updateTicket = async (id, data) => {
   const result = await db
     .update(tickets)
     .set({
-      ...data,
+      status_id: data.status_id,
+      priority_id: data.priority_id,
+      category_id: data.category_id,
+      title: data.title,
+      description: data.description,
       updated_at: new Date(),
     })
     .where(eq(tickets.ticket_id, id))
@@ -51,11 +55,14 @@ export const updateTicket = async (id, data) => {
   const ticket = result[0];
 
   await audit.createLog({
-    user_id: data.user_id,
+    user_id: ticket.requester_id,
     action: "UPDATE_TICKET",
     entity: "tickets",
     entity_id: id,
-    metadata: data,
+    metadata: {
+      status_id: ticket.status_id,
+      priority_id: ticket.priority_id,
+    },
   });
 
   return ticket;

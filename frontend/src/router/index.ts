@@ -4,6 +4,7 @@ import { useAuthStore } from "@/stores/auth";
 import LoginView from "@/views/auth/LoginView.vue";
 import RegisterView from "@/views/auth/RegisterView.vue";
 import DashboardView from "@/views/dashboard/DashboardView.vue";
+import TicketsView from "@/views/tickets/TicketsView.vue";
 
 import MainLayout from "@/layouts/MainLayout.vue";
 
@@ -25,6 +26,11 @@ const router = createRouter({
           path: "dashboard",
           component: DashboardView,
         },
+        
+        {
+          path: "tickets",
+          component: TicketsView,
+        }
       ],
     },
 

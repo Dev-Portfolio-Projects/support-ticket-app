@@ -1,9 +1,10 @@
 import * as service from "./tickets.service.js";
 
 export const create = async (req, res) => {
-  const ticket = await service.createTicket(
-    req.body
-  );
+  const ticket = await service.createTicket({
+    ...req.body,
+    requester_id: req.user.user_id,
+  });
 
   res.status(201).json({
     ok: true,
